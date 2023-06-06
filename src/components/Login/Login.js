@@ -1,4 +1,4 @@
-import React , {useState} from 'react'
+import React , {useState , useEffect} from 'react'
 
 import Card from '../UI/Card/Card'
 import Button from '../UI/Button/Button'
@@ -11,19 +11,33 @@ const Login = (props) => {
   const [passwordValidate , setPasswordValidate] = useState()
   const [formValid , setFormValid] = useState(false)
 
+  useEffect(() => {
+    const identifier = setTimeout(() => {        
+      console.log(123);
+      setFormValid(
+        email.includes('@') && password.trim().length > 6
+      )
+    }, 500)
+
+    return () =>{
+      console.log(456)
+      clearTimeout(identifier)
+    }
+  } , [email , password])
+
   const enterEmailHandler = (event) =>{
     setEmail(event.target.value)
 
-    setFormValid(
-      event.target.value.includes('@') && password.trim().length > 6
-    )
+    // setFormValid(
+    //   event.target.value.includes('@') && password.trim().length > 6
+    // )
   }
   const enterPasswordHandler = (event) =>{
     setpassword(event.target.value)
 
-    setFormValid(
-      event.target.value.trim().length > 6 && email.includes('@')
-    )
+    // setFormValid(
+    //   event.target.value.trim().length > 6 && email.includes('@')
+    // )
   }
 
   const validateEmail = () =>{
