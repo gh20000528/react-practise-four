@@ -1,21 +1,44 @@
-import React , {useState , useEffect} from 'react'
+import React , {useState , useEffect , useReducer} from 'react'
 
 import Card from '../UI/Card/Card'
 import Button from '../UI/Button/Button'
 import classes from './Login.module.css'
 
+const emailReducer = (state , action) =>{
+  if (action.type === 'USER_INPUT') {
+    return {value: action.val  , isValid: action.val.includes('@')}
+  }
+  if (action.type === 'INPUT_BLUR') {
+    return {value: state.value , isValid: state.value.includes('@')}
+  }
+  return {value: '', isValid: false}
+} 
+
+const passwordReducer = (state , action) =>{
+  if (action.type === 'USER_INPUT') {
+    return {value: action.val  , isValid: action.val.trim().length > 6}
+  }
+  if (action.type === 'INPUT_BLUR') {
+    return {value: state.value , isValid: state.value.trim().length > 6}
+  }
+  return {value: '', isValid: false}
+}
+
 const Login = (props) => {
-  const [email , setEmail] = useState('')
-  const [emailValidate, setEmailValidate] = useState()
-  const [password , setpassword] = useState('')
-  const [passwordValidate , setPasswordValidate] = useState()
+ 
   const [formValid , setFormValid] = useState(false)
+
+  const [emailState, dispatchEmail] = useReducer(emailReducer , {value: '' , isValid: undefined})
+  const [passwordState, dispatchPassword] = useReducer(passwordReducer , {value: '' , isValid: undefined})
+
+  const { isValid: emailIsValid } = emailState
+  const { isValid: passwordValid } = passwordState
 
   useEffect(() => {
     const identifier = setTimeout(() => {        
       console.log(123);
       setFormValid(
-        email.includes('@') && password.trim().length > 6
+        emailIsValid && passwordValid
       )
     }, 500)
 
@@ -23,55 +46,55 @@ const Login = (props) => {
       console.log(456)
       clearTimeout(identifier)
     }
-  } , [email , password])
+  } , [emailIsValid , passwordValid])
 
   const enterEmailHandler = (event) =>{
-    setEmail(event.target.value)
+    dispatchEmail({type:'USER_INPUT' , val: event.target.value})
 
     // setFormValid(
     //   event.target.value.includes('@') && password.trim().length > 6
     // )
   }
   const enterPasswordHandler = (event) =>{
-    setpassword(event.target.value)
+    dispatchPassword({type: 'USER_INPUT' , val: event.target.value})
 
     // setFormValid(
-    //   event.target.value.trim().length > 6 && email.includes('@')
+    //   emailState.isValid  && event.target.value.trim().length > 6
     // )
   }
 
   const validateEmail = () =>{
-    setEmailValidate(email.includes('@'))
+    dispatchEmail({type: 'INPUT_BLUR'})
   }
 
   const validatePassword = () =>{
-    setPasswordValidate(password.trim().length > 6)
+    dispatchPassword({type: 'INPUT_BLUR'})
   }
 
 
   const loginHandler = (event) =>{
     event.preventDefault()
-    props.onLogin(email , password)
+    props.onLogin(emailState.value , passwordState.value)
   }
   return (
     <Card className={`${classes.login}`}>
       <form onSubmit={loginHandler}>
-        <div className={ `${classes.control} ${emailValidate === false ? classes.invalid : ''}` }>
+        <div className={ `${classes.control} ${emailState.isValid === false ? classes.invalid : ''}` }>
             <label htmlFor="email">E-mail</label>
             <input 
             //元素失去焦點時觸發相應的事件處理函數
             onBlur={validateEmail}
             onChange={enterEmailHandler}
-            value={email}
+            value={emailState.value}
             id='email' 
             type="text" />
         </div>
-        <div className={`${classes.control} ${passwordValidate === false ? classes.invalid : ''}`}>
+        <div className={`${classes.control} ${passwordState.isValid === false ? classes.invalid : ''}`}>
             <label htmlFor="password">password</label>
             <input 
             onBlur={validatePassword}
             onChange={enterPasswordHandler}
-            value={password}
+            value={passwordState.value}
             type="password" 
             id="password" />
         </div>
