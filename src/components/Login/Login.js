@@ -1,4 +1,5 @@
 import React , {useState} from 'react'
+
 import Card from '../UI/Card/Card'
 import Button from '../UI/Button/Button'
 import classes from './Login.module.css'
@@ -36,7 +37,7 @@ const Login = (props) => {
 
   const loginHandler = (event) =>{
     event.preventDefault()
-    props.Login(email , password)
+    props.onLogin(email , password)
   }
   return (
     <Card className={`${classes.login}`}>
@@ -60,7 +61,7 @@ const Login = (props) => {
             type="password" 
             id="password" />
         </div>
-        <div className={`${classes.actions}`}>
+        <div className={classes.actions}>
             <Button 
             type='submit' 
             className={classes.btn} 
